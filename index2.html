@@ -1,0 +1,276 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+#mydiv
+{
+}
+#addForm
+{
+	position: absolute;
+	right: 20%;
+	top: 0;
+}
+#butt{
+	position: absolute;
+	right: 31%;
+	top: 30%;
+}
+</style>
+<script>
+/* function get_ob(){
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {// code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	  return xmlhttp;
+ }
+
+function send(funk,co){
+	xmlhttp=get_ob();
+	xmlhttp.onreadystatechange=function(){xhr(co);}
+	xmlhttp.open("POST","funkcje2.php",true);
+	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlhttp.send(funk);
+}
+
+function xhr(co)
+	  {
+	  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		{
+			if(co==1){
+				var odp=JSON.parse(xmlhttp.responseText);
+				var txt='';
+				for(i=0;i<odp.length;i++){
+					txt+=odp[i][1]+" <button onclick='us("+odp[i][0]+")'>USUN</button><br>";
+				}
+				document.querySelector("#myDiv").innerHTML=txt;
+			}else if(co==2){
+				send('f=3',1)
+			}
+		}
+		
+	  }
+
+function us(id){
+	send('f=2&id='+id,2);
+}	  
+	  
+function start(){
+	send('f=3',1);
+	setInterval("send('f=3',1)",3000);
+}
+
+function go(){
+	var qry="obrazek=" + encodeURIComponent(document.queryString("#obr")) +
+	"&gatunek=" + encodeURIComponent(document.queryString("#gatunek")) + 
+	"&data_powstania=" + encodeURIComponent(document.queryString("#data")) +
+	"&rezyser=" + encodeURIComponent(document.queryString("#rezyser"));
+	send(qry,null);
+}
+*/
+var tab = [7]
+var datasend
+
+function get_obj(){
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {// code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	return xmlhttp;
+}
+
+function start(){
+	send("",0,0);
+}
+
+function back(js_fun){
+	if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		if(js_fun==0){
+			ob=JSON.parse(xmlhttp.responseText);
+			console.log(xmlhttp.responseText);
+			makeTable()
+		}else if(js_fun == 2){
+			ob=JSON.parse(xmlhttp.responseText);
+			makeTableToAdd()
+		}else{
+			console.log(xmlhttp.responseText)
+		}
+	}
+}
+//ob[0][cos] - tabele, ob[1][cos] - select
+//curl - wysyłanie danych na stronę 
+function send(data,fun,js_fun){
+	xmlhttp=get_obj();
+	xmlhttp.onreadystatechange=function(){back(js_fun)}; 
+	
+	xmlhttp.open("GET","test.php?data="+data+"&f="+fun,true);
+	console.log(data);
+	//xmlhttp.open("GET","test.php?"+data+"&f="+fun,true);
+	xmlhttp.send();
+}
+
+function addToBase()
+{
+	tab[0] = n + 1;
+	
+	naz = document.getElementById("nazwa")	
+	tab[1] = naz.value;
+	naz.value = null;
+	
+	gat = document.getElementById("gatunek")	
+	tab[2] = gat.value;
+	gat.value = null;
+	
+	data = document.getElementById("data")	
+	tab[3] = data.value;
+	data.value = null;
+	
+	rez = document.getElementById("rezyser")	
+	tab[4] = rez.value;
+	rez.value = null;
+	
+	obr = document.getElementById("obrazek")	
+	tab[5] = obr.value;
+	obr.value = null;
+	
+	good = document.getElementById("dobry")
+	//tab[6] = "in progress";
+	if(good.checked)
+	{
+		tab[6] = "tak";
+		good.checked = false;
+	}
+	else
+	{
+		tab[6] = "nie";
+	}
+	console.log(tab)
+	datasend = JSON.stringify(tab);
+	send(datasend,1,2)
+	for(var i = 0; i < 7;  i++)
+	{	
+		tab[i] = null
+	}
+	datasend = null;
+	
+}
+
+function makeTable(){
+	n = ob.length;
+			for(var i = 0; i < n; i++)
+			{
+				row = document.createElement("tr");
+				document.getElementById("mainTab").appendChild(row);
+				for(var j = 0; j < 7; j++)
+				{		
+					kom = document.createElement("td");
+					if(j != 6)
+						kom.innerHTML = ob[i][j]
+					
+					else if(j == 6)
+					{
+						bt = document.createElement("button");						
+						bt.innerHTML = "Usuń";
+						kom.appendChild(bt);
+					}
+					row.appendChild(kom);
+				}
+			}
+}
+
+function makeTableToAdd(){
+	n = ob.length;
+			for(var i = n - 1; i < n; i++)
+			{
+				row = document.createElement("tr");
+				document.getElementById("mainTab").appendChild(row);
+				for(var j = 0; j < 7; j++)
+				{		
+					kom = document.createElement("td");
+					if(j != 6)
+						kom.innerHTML = ob[i][j]
+					
+					else if(j == 6)
+					{
+						bt = document.createElement("button");						
+						bt.innerHTML = "Usuń";
+						kom.appendChild(bt);
+					}
+					row.appendChild(kom);
+				}
+			}
+}
+
+</script>
+</head>
+<body onload="start();" >
+<div id="mdiv">
+		<table id="mainTab" border = "1">
+		<tr>
+			<td class="id">Id</td>
+			<td class="nazwaf">Nazwa filmu</td>
+			<td class="obrazekf">Obrazek</td>
+			<td class="gatunekf">Gatunek</td>	
+			<td class="dataf">Data powstania</td>
+			<td class="rezyserf">Rezyser</td>
+			<td class="usunf"></td>
+		</tr>
+		</table>
+		<button  id = "butt" onclick="addToBase()">Dodaj</button>
+        <form id="addForm">
+                <table border="1">
+                        <tr>
+                                <td colspan="2">Formularz dodawania danych:</td>
+                        </tr>
+                        <tr>
+                                <td>Nazwa filmu</td>
+                                <td><label><input id="nazwa" type="text"></input></label></td>
+                        </tr>
+                        <tr>
+                                <td>Gatunek</td>
+                                <td><label><input id="gatunek"type="text"></input></label></td>
+                        </tr>
+                        <tr>
+                                <td>Data Powstania</td>
+                                <td><label><input id="data"type="text"></input></label></td>
+                        </tr>
+                        <tr>
+                                <td>Reżyser</td>
+                                <td><label><input id="rezyser"type="text"></input></label></td>
+                        </tr>
+                        <tr>
+                                <td>Obrazek</td>
+                                <td><label><input id="obrazek"type="text"></input></label></td>
+                        </tr>
+
+                        <tr>
+                                <td>Czy dobry ?</td>
+                                <td><label>Tak! <input id="dobry" type="checkbox"></input></label></td>
+                        </tr>
+                        <!--<tr>                      
+                                <td><button  onclick="addToBase()">Dodaj</button></td>
+                        </tr> -->
+                </table>
+               
+        </form>
+		
+						
+</div>
+
+<div id="myDiv"></div>
+
+</body>
+</html>
+
+
